@@ -34,9 +34,14 @@ abstract contract Piece {
         return killed;
     }
 
-    function setKilled(bool _killed) public {
+    function setKilled(
+        bool _killed,
+        Player player,
+        Piece piece
+    ) public {
         require(!killed, "already killed");
         killed = _killed;
+        player.removePiece(piece);
     }
 
     function getXY() public view returns (uint256, uint256) {

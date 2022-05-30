@@ -10,11 +10,11 @@ contract ChessBoard {
     Piece kingPlayer2;
 
     // ChessGame boardFor; // for access restriction
-    constructor(Player[] memory player) {
+    constructor(Player[2] memory player) {
         resetBoard(player);
     }
 
-    function resetBoard(Player[] memory player) public {
+    function resetBoard(Player[2] memory player) public {
         resetBoardPieces(true, 0, 1, player[0]);
         resetBoardPieces(false, 7, 6, player[1]);
         // reset other spaces
@@ -66,7 +66,7 @@ contract ChessBoard {
 
     // isPlayer1 means who played last
     function checkmateCheck(
-        Player[] memory player,
+        Player[2] memory player,
         bool isPlayer1,
         ChessBoard chessBoard
     ) public returns (bool, Piece) {

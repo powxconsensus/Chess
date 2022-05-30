@@ -32,7 +32,7 @@ contract ChessGame {
         player[0] = new Player(player1, true);
         player[1] = new Player(player2, false);
         playerTurnIdx = 0;
-        chessBoard = new ChessBoard();
+        chessBoard = new ChessBoard(player);
         startedAt = block.timestamp;
         owner = msg.sender;
         gameStatus = GAME_STATUS.PAUSED;
@@ -69,7 +69,11 @@ contract ChessGame {
             )
         ) {
             if (pieceAtE != Piece(address(0))) {
-                pieceAtE.setKilled(true);
+                pieceAtE.setKilled(
+                    true,
+                    player[(playerTurnIdx + 1) % 2],
+                    pieceAtE
+                );
             }
             chessBoard.move(pieceAtS, ex, ey);
             //after each move check is this checkmate condition for opponent
