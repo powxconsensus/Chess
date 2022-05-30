@@ -6,20 +6,17 @@ import "./Piece.sol";
 contract ChessBoard {
     uint256 cnt = 0;
     Piece[8][8] public board;
-    Piece[] public player1Pieces;
-    Piece[] public player2Pieces;
-    mapping(Piece => uint256) indexMapping;
     Piece kingPlayer1;
     Piece kingPlayer2;
 
     // ChessGame boardFor; // for access restriction
-    constructor() {
-        resetBoard();
+    constructor(Player[] memory player) {
+        resetBoard(player);
     }
 
-    function resetBoard() public {
-        resetBoardPieces(true, 0, 1);
-        resetBoardPieces(false, 7, 6);
+    function resetBoard(Player[] memory player) public {
+        resetBoardPieces(true, 0, 1, player[0]);
+        resetBoardPieces(false, 7, 6, player[1]);
         // reset other spaces
         for (uint256 i = 2; i < 6; i++) {
             for (uint256 j = 0; j < 8; j++) {
@@ -31,7 +28,8 @@ contract ChessBoard {
     function resetBoardPieces(
         bool isWhite,
         uint256 idx1,
-        uint256 idx2
+        uint256 idx2,
+        Player player
     ) internal {
         board[idx1][0] = new Rook(isWhite, 0, 0);
         board[idx1][7] = new Rook(isWhite, 0, 7);
@@ -45,19 +43,8 @@ contract ChessBoard {
         else kingPlayer2 = board[idx1][4];
         for (uint256 i = 0; i < 8; i++) {
             board[idx2][i] = new Pawn(isWhite, 1, i);
-            if (isWhite) {
-                indexMapping[board[idx2][i]] = player1Pieces.length;
-                player1Pieces.push(board[idx2][i]);
-                //
-                indexMapping[board[idx1][i]] = player1Pieces.length;
-                player1Pieces.push(board[idx1][i]);
-            } else {
-                indexMapping[board[idx2][i]] = player2Pieces.length;
-                player2Pieces.push(board[idx2][i]);
-                //
-                indexMapping[board[idx1][i]] = player2Pieces.length;
-                player2Pieces.push(board[idx1][i]);
-            }
+            player.addPiece(board[idx2][i], i);
+            player.addPiece(board[idx1][i], i);
         }
     }
 
@@ -78,41 +65,42 @@ contract ChessBoard {
     }
 
     // isPlayer1 means who played last
-
     function checkmateCheck(
-        Player player,
+        Player[] memory player,
         bool isPlayer1,
         ChessBoard chessBoard
     ) public returns (bool, Piece) {
         // should be as view
         if (isPlayer1) {
             (uint256 ex, uint256 ey) = kingPlayer2.getXY();
-            for (uint256 i = 0; i < player1Pieces.length; i++) {
+            Piece[] memory pieces = player[0].getPieces();
+            for (uint256 i = 0; i < pieces.length; i++) {
                 if (
-                    player1Pieces[i].canMove(
-                        player1Pieces[i],
+                    pieces[i].canMove(
+                        pieces[i],
                         kingPlayer2,
                         ex,
                         ey,
-                        player,
+                        player[0],
                         chessBoard
                     )
-                ) return (true, player1Pieces[i]);
+                ) return (true, pieces[i]);
             }
             return (false, Piece(address(0)));
         } else {
             (uint256 ex, uint256 ey) = kingPlayer1.getXY();
-            for (uint256 i = 0; i < player2Pieces.length; i++) {
+            Piece[] memory pieces = player[1].getPieces();
+            for (uint256 i = 0; i < pieces.length; i++) {
                 if (
-                    player2Pieces[i].canMove(
-                        player2Pieces[i],
+                    pieces[i].canMove(
+                        pieces[i],
                         kingPlayer1,
                         ex,
                         ey,
-                        player,
+                        player[1],
                         chessBoard
                     )
-                ) (true, player2Pieces[i]);
+                ) (true, pieces[i]);
             }
             return (false, Piece(address(0)));
         }

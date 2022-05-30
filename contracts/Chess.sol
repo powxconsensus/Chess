@@ -49,7 +49,7 @@ contract ChessGame {
         uint256 sy,
         uint256 ex,
         uint256 ey
-    ) public isValidCoor(sx, sy) isValidCoor(ex, ey) returns (bool) {
+    ) public isValidCoor(sx, sy) isValidCoor(ex, ey) {
         require(gameStatus == GAME_STATUS.ACTIVE, "Game not started yet");
         require(
             player[playerTurnIdx].getPlayerAddress() == msg.sender,
@@ -74,7 +74,7 @@ contract ChessGame {
             chessBoard.move(pieceAtS, ex, ey);
             //after each move check is this checkmate condition for opponent
             (bool checkmate, Piece byPiece) = chessBoard.checkmateCheck(
-                player[playerTurnIdx],
+                player,
                 (0 == playerTurnIdx),
                 chessBoard
             );
